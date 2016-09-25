@@ -15,6 +15,7 @@ gem 'rake'
 gem 'shotgun', '~>0.9.1'
 
 gem 'awesome_print'
+gem 'pry-byebug'
 gem 'bcrypt'
 gem 'httparty'
 

@@ -14,6 +14,9 @@ require 'pathname'
 require 'pg'
 require 'active_record'
 require 'logger'
+require 'awesome_print'
+require 'pry-byebug'
+require 'httparty'
 
 require 'sinatra'
 require "sinatra/reloader" if development?
