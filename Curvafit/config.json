@@ -1,7 +1,0 @@
-{
-  "app_name": "Curvafit",
-  "api_url": "https://us.bookingbug.com",
-  "default_html": "/index.html",
-  "googlemaps_api_key": "AIzaSyDFAIV9IW8riXGAzlupPb9_6X14dxmUMt8",
-  "server_port": 8000
-}
