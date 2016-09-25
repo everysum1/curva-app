@@ -16,6 +16,7 @@ gem 'shotgun', '~>0.9.1'
 
 gem 'awesome_print'
 gem 'bcrypt'
+gem 'httparty'
 
 group :test do
   gem 'shoulda-matchers'
