@@ -1,28 +1,45 @@
+require 'json'
+
 class BookingbugAdapter
   include HTTParty
 
   base_uri 'https://us.bookingbug.com/api/v1'
 
-  def initialize(args = {})
+  def initialize
     @basic_auth = { email: ENV['BOOKING_BUG_EMAIL'],
                     password: ENV['BOOKING_BUG_PASSWORD'] }
+    @booking_bug_key = ENV['BOOKING_BUG_KEY']
+    @booking_bug_id =  ENV['BOOKING_BUG_ID']
     @company_id = ENV['BOOKING_BUG_COMPANY_ID']
-    @auth_token = post_login_for_auth_token
-    @clients = get_existing_clients[:clients]
-    @slots = get_available_slots
+    # @clients = get_existing_clients
+    # @slots = get_available_slots
+    @request_options = { headers: { 
+                                    'App-Key' => @booking_bug_key,
+                                    'App-Id' => @booking_bug_id
+                                  },
+                            body: {
+                                    "email" => @basic_auth[:email],
+                                    "password" => @basic_auth[:password]
+                                  }
+    }
+    get_auth_token
   end
 
-  def test_endpoint(endpoint)
+  def auth_token
+    @auth_token
+  end
+
+  def test_endpoint(endpoint, options = {})
     self.class.get(endpoint)
   end
 
-  def post_login_for_auth_token
-    self.class.post('/login', basic_auth: @basic_auth)
-    #add body with admin email/password
+  def get_auth_token
+    response = self.class.post('/login', @request_options)
+    @request_options[:headers]['Auth-Token'] = response['auth_token']
   end
 
   def get_company
-    test_endpoint("/admin/#{@company_id}/company")
+    test_endpoint("/admin/#{@company_id}/company", @request_options)
   end
 
   def get_locations
@@ -70,7 +87,7 @@ class BookingbugAdapter
 
   def checkout(email)
     @member_id = post_client(email: email)
-    self.class.post("#{@company_id}/basket/checkout{?#{@member_id},take_from_wallet"}
+    self.class.post("#{@company_id}/basket/checkout{?#{@member_id},take_from_wallet")
   end
 end
 
