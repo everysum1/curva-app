@@ -11,18 +11,13 @@ class BookingbugAdapter
     @booking_bug_key = ENV['BOOKING_BUG_KEY']
     @booking_bug_id =  ENV['BOOKING_BUG_ID']
     @company_id = ENV['BOOKING_BUG_COMPANY_ID']
+    @headers = { headers: { 
+                            'App-Key' => @booking_bug_key,
+                            'App-Id' => @booking_bug_id
+                          }
+    get_auth_token
     # @clients = get_existing_clients
     # @slots = get_available_slots
-    @request_options = { headers: { 
-                                    'App-Key' => @booking_bug_key,
-                                    'App-Id' => @booking_bug_id
-                                  },
-                            body: {
-                                    "email" => @basic_auth[:email],
-                                    "password" => @basic_auth[:password]
-                                  }
-    }
-    get_auth_token
   end
 
   def auth_token
@@ -30,59 +25,68 @@ class BookingbugAdapter
   end
 
   def test_endpoint(endpoint, options = {})
-    self.class.get(endpoint)
+    self.class.get(endpoint, options)
   end
 
   def get_auth_token
-    response = self.class.post('/login', @request_options)
-    @request_options[:headers]['Auth-Token'] = response['auth_token']
+    login_body = { body:  {
+                              "email" => @basic_auth[:email],
+                              "password" => @basic_auth[:password]
+                           }
+    }
+    login_options = @headers.merge(login_body)
+    response = self.class.post('/login', login_options)
+    @headers[:headers]['Auth-Token'] = response['auth_token']
+
+    ap "*" * 100
+    ap @headers[:headers]['Auth-Token']
   end
 
   def get_company
-    test_endpoint("/admin/#{@company_id}/company", @request_options)
+    ap test_endpoint("/admin/#{@company_id}/company", @headers)
   end
 
   def get_locations
-    test_endpoint("/admin/#{@company_id}/addresses", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/admin/#{@company_id}/addresses", @headers)
   end
 
   def get_services
-    test_endpoint("/admin/#{@company_id}/services", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/admin/#{@company_id}/services", @headers)
   end
 
   def get_available_slots
-    test_endpoint("/#{@company_id}/services/time_data", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/#{@company_id}/services/time_data", @headers)
   end
 
   def collect_user_details
     test_endpoint("/#{@company_id}/questions?detail_group_id=", #ADD DETAIL GROUP ID
-    basic_auth: @basic_auth, auth_token: @auth_token)
+    @headers)
   end
 
   def get_existing_clients
-    test_endpoint("/admin/#{@company_id}", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/admin/#{@company_id}", @headers)
     # "/client{/id}{?page,per_page,filter_by,filter_by_fields,order_by,order_by_reverse,search_by_fields}",
   end
 
   def get_client_by_email(email)
-    test_endpoint("/#{@company_id}/client/find_by/#{email}", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/#{@company_id}/client/find_by/#{email}", @headers)
   end
 
   def post_client(client = {})
-    self.class.post("/#{@company_id}/client", basic_auth: @basic_auth)
+    self.class.post("/#{@company_id}/client", @headers)
   end
 
   def confirm_booking
-    self.class.post("/#{@company_id}/#SOMETHING", basic_auth: @basic_auth)
+    self.class.post("/#{@company_id}/#SOMETHING", @headers)
   end
 
   def add_to_basket
     self.class.post("/#{@company_id}/basket/add_item(?)", #SOMETHING 
-    basic_auth: @basic_auth)
+    @headers)
   end
 
   def get_basket
-    test_endpoint("/#{@company_id}/basket", basic_auth: @basic_auth, auth_token: @auth_token)
+    test_endpoint("/#{@company_id}/basket", @headers)
   end
 
   def checkout(email)
