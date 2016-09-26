@@ -1,5 +1,7 @@
 get '/bookingbug' do 
   @booking_bug = BookingbugAdapter.new
-  ap @booking_bug.test_endpoint('/')
+  ap "*" * 75 + "REQUEST" + "*" * 75
+  ap @booking_bug.get_training_slots
+  ap "*" * 150
   erb :'booking_bug/index'
 end
