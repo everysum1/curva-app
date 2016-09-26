@@ -6,22 +6,21 @@ class BookingbugAdapter
   base_uri 'https://us.bookingbug.com/api/v1'
 
   def initialize
-    @basic_auth = { email: ENV['BOOKING_BUG_EMAIL'],
+    @basic_auth = {    email: ENV['BOOKING_BUG_EMAIL'],
                     password: ENV['BOOKING_BUG_PASSWORD'] }
     @booking_bug_key = ENV['BOOKING_BUG_KEY']
     @booking_bug_id =  ENV['BOOKING_BUG_ID']
     @company_id = ENV['BOOKING_BUG_COMPANY_ID']
     @headers = { headers: { 
                             'App-Key' => @booking_bug_key,
-                            'App-Id' => @booking_bug_id
+                             'App-Id' => @booking_bug_id
                           }
+    }
     get_auth_token
+    @locations = get_locations['addresses']
+    @services = get_services['services']
     # @clients = get_existing_clients
-    # @slots = get_available_slots
-  end
-
-  def auth_token
-    @auth_token
+    # @slots_open = get_available_slots
   end
 
   def test_endpoint(endpoint, options = {})
@@ -30,20 +29,17 @@ class BookingbugAdapter
 
   def get_auth_token
     login_body = { body:  {
-                              "email" => @basic_auth[:email],
-                              "password" => @basic_auth[:password]
+                               "email" => @basic_auth[:email],
+                            "password" => @basic_auth[:password]
                            }
     }
     login_options = @headers.merge(login_body)
     response = self.class.post('/login', login_options)
     @headers[:headers]['Auth-Token'] = response['auth_token']
-
-    ap "*" * 100
-    ap @headers[:headers]['Auth-Token']
   end
 
   def get_company
-    ap test_endpoint("/admin/#{@company_id}/company", @headers)
+    test_endpoint("/admin/#{@company_id}/company", @headers)
   end
 
   def get_locations
@@ -54,9 +50,19 @@ class BookingbugAdapter
     test_endpoint("/admin/#{@company_id}/services", @headers)
   end
 
-  def get_available_slots
-    test_endpoint("/#{@company_id}/services/time_data", @headers)
+  def get_service_id(service)
+    # SOMETHING
   end
+
+  def get_training_slots_by_days(startdate, enddate, get_service_id(service))
+    test_endpoint("/#{@company_id}/services?service_id=74695&date=YYYY-MM-DD&end_date=YYYY-MM-DD&duration=60", @headers)
+  end
+
+  def get_trainer_slots(trainer)
+    test_endpoint("/#{@company_id}/services?service_id=74695&date=YYYY-MM-DD&end_date=YYYY-MM-DD&duration=60", @headers)
+  end
+
+  def 
 
   def collect_user_details
     test_endpoint("/#{@company_id}/questions?detail_group_id=", #ADD DETAIL GROUP ID
