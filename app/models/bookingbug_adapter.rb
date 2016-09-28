@@ -3,6 +3,8 @@ require 'json'
 class BookingbugAdapter
   include HTTParty
 
+  attr_reader :services
+
   base_uri 'https://us.bookingbug.com/api/v1'
 
   def initialize
@@ -51,11 +53,12 @@ class BookingbugAdapter
   end
 
   def get_service_id(service)
-    # SOMETHING
+    @services.find(#something)
   end
 
-  def get_training_slots_by_days(startdate, enddate, get_service_id(service))
-    test_endpoint("/#{@company_id}/services?service_id=74695&date=YYYY-MM-DD&end_date=YYYY-MM-DD&duration=60", @headers)
+  def get_training_slots_by_days(startdate, enddate, service)
+    service_id = get_service_id(service)
+    test_endpoint("/#{@company_id}/services?service_id=#{service_id}&date=YYYY-MM-DD&end_date=YYYY-MM-DD&duration=60", @headers)
   end
 
   def get_trainer_slots(trainer)
